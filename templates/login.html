@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Dr.Breaths Login{% endblock %}
+
+{% block styles %}
+<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600&display=swap" rel="stylesheet">
+<style>
+  body, html {
+    height: 100%;
+    margin: 0;
+    font-family: 'Open Sans', sans-serif;
+    background-color: #f7f9fc; /* A lighter, more vibrant background */
+  }
+
+  .login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 400px;
+    background-color: #ffffff; /* White background */
+    border-radius: 16px; /* More rounded corners for modern look */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* More pronounced shadow for depth */
+    padding: 40px; /* More padding for a spacious layout */
+    box-sizing: border-box;
+  }
+
+  .card-header {
+    background-color: #5d93e1; /* Adjusted to a lighter, more vibrant blue */
+    color: #ffffff;
+    font-size: 22px; /* Slightly smaller for elegance */
+    font-weight: 600; /* Adjust weight for readability */
+    text-align: center;
+    padding: 20px;
+    border-radius: 12px 12px 0 0; /* Maintain rounded corners at the top */
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 10px;
+    color: #333;
+  }
+
+  input[type=text], input[type=password] {
+    border: 2px solid #dfe1e5; /* Thicker border for prominence */
+    border-radius: 8px; /* Rounded borders for input fields */
+    padding: 15px; /* Increased padding for comfort */
+    font-size: 16px;
+    width: 100%; /* Ensuring full width */
+  }
+
+  button[type=submit] {
+    background-color: #5d93e1; /* Matching the header color */
+    color: #ffffff;
+    font-size: 18px; /* Larger font size for better clickability */
+    padding: 15px 0;
+    border: none;
+    border-radius: 8px; /* Rounded borders for the button */
+    cursor: pointer;
+    width: 100%; /* Ensuring full width */
+    margin-top: 10px; /* Adding margin-top for spacing */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adding shadow to the button for depth */
+  }
+
+  .link-container {
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  a {
+    color: #5d93e1;
+    font-weight: 600;
+  }
+
+  a:hover {
+    text-decoration: none; /* Removing underline on hover for a cleaner look */
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+  <div class="card">
+    <div class="card-header">Dr.BreathE Login</div>
+    <div class="card-body">
+      {% if error_message %}
+        <div class="alert alert-danger" role="alert">{{ error_message }}</div>
+      {% endif %}
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" class="form-control" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        <button type="submit">Login</button>
+      </form>
+      <div class="link-container">
+        <p>Don't have an account? <a href="{% url 'register' %}">Register here</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

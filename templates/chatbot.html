@@ -1,0 +1,367 @@
+{% extends 'base.html' %}
+
+{% block title %}Dr.Breaths Chat{% endblock %}
+
+{% block styles %}
+<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600&display=swap" rel="stylesheet">
+<style>
+
+  /* Hide scrollbar for the entire page but allow scrolling */
+  html {
+    overflow-y: scroll;
+    scrollbar-width: none; /* For Firefox */
+  }
+
+  body::-webkit-scrollbar {
+    display: none; /* For Chrome, Safari, and Opera */
+  }
+
+  body, html {
+    height: 100%;
+    margin: 0;
+    font-family: 'Open Sans', sans-serif;
+    background-color: #f7f9fc;
+  }
+
+  .chat-container {
+    display: flex;
+    padding-bottom: 0;
+    flex-direction: column;
+    align-items: center; /* Center the chat card on the page */
+    height: 100vh;
+    padding-top: 20px; /* Provide some space on the top */
+    box-sizing: border-box;
+  }
+
+  .card {
+    width: 100%; /* Full width to start with */
+    max-width: 808px; /* Maximum width of the card - you can adjust this */
+    background-color: #ffffff;
+    border-radius: 16px 16px 8px 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px; /* Space at the bottom */
+  }
+
+  .card-header {
+    background-color: #5d93e1;
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 600;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000; 
+  }
+
+  .card-header a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 0 10px;
+  }
+
+  .card-header a:hover {
+    text-decoration: underline;
+    color: #ace2f8;
+    cursor: pointer;
+  }
+
+  .messages-box {
+    flex: 1;
+    overflow-y: auto; /* Allows scrolling within the messages box */
+    padding: 20px;
+    margin-top: 72px;
+    margin-bottom: 0; /* Space for the input box */
+    height: calc(100vh - 72px - 100px);
+    padding-bottom: 100px;
+    scrollbar-width: thin; /* For Firefox */
+    scrollbar-color: #c1c1c1 #f0f0f0; /* For Firefox */
+  }
+
+  .messages-box::-webkit-scrollbar {
+    width: 4px; /* For Chrome, Safari, and Opera */
+  }
+
+  .messages-box::-webkit-scrollbar-track {
+    background: #f0f0f0; /* For Chrome, Safari, and Opera */
+  }
+
+  .messages-box::-webkit-scrollbar-thumb {
+    background-color: #c1c1c1; /* For Chrome, Safari, and Opera */
+    border-radius: 20px;
+    border: 3px solid #f0f0f0;
+  }
+
+  .message {
+    display: flex;
+    width: 100%;
+    padding: 10px 0; /* Adjust padding to suit */
+  }
+
+  .sent {
+    justify-content: flex-end;
+  }
+
+  .sent .message-text {
+    background-color: #dcf8c6;
+    border-radius: 10px;
+    padding: 10px;
+    max-width: 60%; /* Adjust the width of the messages */
+    margin-right: 20px; /* Right margin for visual spacing */
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .received {
+    justify-content: flex-start;
+  }
+
+  .received .message-text {
+    background-color: #eef2fa;
+    border-radius: 10px;
+    padding: 10px;
+    max-width: 60%; /* Adjust the width of the messages */
+    margin-left: 20px; /* Left margin for visual spacing */
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .message-form {
+    position: fixed;
+    bottom: 25px; /* Height of the disclaimer */
+    left: 50%; /* Center the message form */
+    transform: translateX(-50%); /* Align center */
+    display: flex;
+    align-items: stretch;
+    width: calc(100% - 40px); /* Adjust for the padding of the chat-container */
+    max-width: 808px; /* Increase max-width to account for the 20px padding on both sides */
+    padding: 10px 20px;
+    background-color: #ffffff;
+    border-top: 2px solid #dfe1e5;
+    box-sizing: border-box;
+    z-index: 1000; /* Make sure it's above the messages */
+  }
+
+  .message-input {
+    flex-grow: 1;
+    border-radius: 8px 0 0 8px;
+    border: 2px solid #dfe1e5;
+    border-right: none; /* Remove right border where input meets button */
+  }
+
+  .message-input, .btn-send {
+    height: 50px; /* Example fixed height, adjust as needed */
+    padding: 10px;
+    margin: 0; /* Adjust margin as needed */
+    border-radius: 8px; /* Rounded corners for the input */
+  }
+
+  .btn-send {
+    background-color: #5d93e1;
+    color: #ffffff;
+    border: none;
+    border-radius: 0 8px 8px 0; /* Rounded corners on the right side only */
+    cursor: pointer;
+    padding: 10 20px; /* Padding for textual content */
+  }
+
+  .btn-send:hover {
+    background-color: #4a7bc1;
+  }
+
+  /* Align the send button text if necessary */
+  .btn-send span, .btn-send i {
+    line-height: 50px; /* Match the line height to your button's height for vertical centering */
+    }
+
+  .input-group-append {
+    flex-grow: 0;
+    }
+
+  /* Style the disclaimer to sit above the message input */
+  .chat-footer {
+    position: fixed;
+    bottom: 0px;
+    left: 0;
+    right: 0;
+    background-color: #ffffff; /* Match the card background */
+    color: #6c757d; /* muted color for the disclaimer text */
+    font-size: 0.5rem; /* smaller font size for less emphasis */
+    text-align: center; /* center the disclaimer text */
+    padding: 10px 20px; /* padding for a little space */
+    width: calc(100% - 40px); /* Adjust for the padding of the chat-container */
+    max-width: 808px; /* to match the width of the card */
+    margin-left: auto; /* Center the footer */
+    margin-right: auto; /* Center the footer */
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+
+  {% if messages %}
+  <div class="messages">
+    {% for message in messages %}
+    <div class="django-message {{ message.tags }}">
+      <span class="close-btn">&times;</span>
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}  
+
+  <div class="card flex-grow-1">
+    <div class="card-header">
+      Chat
+    </div>
+    {% if user.is_authenticated %}
+    <div class="card-header">
+      <span><b>Welcome, {{ user.username }}</b></span>
+      <div>
+        <a href="{% url 'logout' %}">Logout</a>  
+        <a href="{% url 'clear_session' %}">Clear session</a>
+      </div>
+    </div>
+    {% else %}
+    <div class="card-header" style="background-color: #5d93e1; color: white;">
+      <a href="{% url 'login' %}">Login</a>    
+      <a href="{% url 'register' %}">Register</a> 
+    </div>
+    {% endif %}  
+    <div class="card-body messages-box">
+      <ul class="list-unstyled messages-list">
+        {% if chat.message is None%}
+          <li class="message received">
+            <div class="message-text">
+              <div class="message-sender">
+                <b>Dr. BreathE</b>
+              </div>
+              <div class="message-content">
+                Hi {{user.username}}, I am Dr. BreathE. How can I help you?
+              </div>
+            </div>
+          </li>
+        {% endif %}
+        {% for chat in chats %}
+          {% if chat.user == request.user %}
+            <li class="message sent">
+              <div class="message-text">
+                <div class="message-sender">
+                  <b>You</b>
+                </div>
+                <div class="message-content">
+                  {{chat.message}}
+                </div>
+              </div>
+            </li>
+
+            <li class="message received">
+              <div class="message-text">
+                <div class="message-sender">
+                  <b>Dr.BreathE</b>
+                </div>
+                <div class="message-content">
+                  {{chat.response}}
+                </div>
+              </div>
+            </li>
+          {% endif %}
+        {% endfor %}
+
+      </ul>
+    </div>
+  </div>
+  <form class="message-form">
+    {%csrf_token%}
+    <div class="input-group">
+      <input type="text" class="form-control message-input" placeholder="Type your message...">
+      <div class="input-group-append">
+        <button type="submit" class="btn btn-primary btn-send">Send</button>
+      </div>
+    </div>
+  </form>
+  <div class="chat-footer">
+    Dr.BreathE GPT can make mistakes. Consider checking important information.
+  </div>
+</div>
+
+<script>
+  const messagesList = document.querySelector('.messages-list');
+  const messageForm = document.querySelector('.message-form');
+  const messageInput = document.querySelector('.message-input');
+
+  // Close button functionality for messages
+  window.addEventListener('load', (event) => {
+    document.querySelectorAll('.close-btn').forEach(button => {
+      button.addEventListener('click', function() {
+        this.parentElement.style.display = 'none';
+      });
+    });
+  });
+  
+  function scrollToBottom() {
+    window.scrollTo(0, document.body.scrollHeight)
+  }
+
+  messageForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    // do not return anything if the sent message is empty.
+    const message = messageInput.value.trim();
+    if (message.length ===0){
+      return;
+    }
+    
+    // if message lists it in the UI.
+    const messageItem = document.createElement('li');
+    messageItem.classList.add('message', 'sent');
+    messageItem.innerHTML = `
+        <div class="message-text">
+          <div class="message-sender">
+            <b>You</b>
+          </div>
+          <div class="message-content">
+              ${message}
+          </div>
+        </div>`;
+    messagesList.appendChild(messageItem);
+
+    messageInput.value = '';
+    scrollToBottom();
+
+    // Gets responce from chatbot api
+    fetch('chatbot', {
+      method: 'POST',
+      header: { 'Content-Type': 'application/x-www-form-urlencoded'},
+      body: new URLSearchParams({
+        'csrfmiddlewaretoken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        'message': message
+      })
+    })
+      .then(response => response.json())
+      .then(data => {
+        const response = data.response;
+        const messageItem = document.createElement('li');
+        messageItem.classList.add('message', 'received');
+        messageItem.innerHTML = `
+        <div class="message-text">
+            <div class="message-sender">
+              <b>Dr. BreathE</b>
+            </div>
+            <div class="message-content">
+                ${response}
+            </div>
+        </div>
+          `;
+        messagesList.appendChild(messageItem);
+        scrollToBottom();
+      });
+  });
+  window.onload = scrollToBottom;
+  //document.addEventListener('DOMContentLoaded', scrollToBottom());
+</script>
+{% endblock %}
