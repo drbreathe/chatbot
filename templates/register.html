@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+
+{% block title %}Dr.Breaths Signup{% endblock %}
+
+{% block styles %}
+<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600&display=swap" rel="stylesheet">
+<style>
+  body, html {
+    height: 100%;
+    margin: 0;
+    font-family: 'Open Sans', sans-serif;
+    background-color: #f7f9fc; /* Consistent background with the login page */
+  }
+
+  .signup-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 400px;
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    box-sizing: border-box;
+  }
+
+  .card-header {
+    background-color: #5d93e1; /* Softer blue color */
+    color: #ffffff;
+    font-size: 22px; /* Larger font size */
+    font-weight: 700; /* Heavier weight for the header */
+    text-align: center;
+    padding: 20px 0;
+    border-radius: 8px 8px 0 0;
+  }
+
+  .card-body {
+    padding: 20px 40px;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  label {
+  font-weight: 600;
+  font-size: 16px; /* Ensures consistency in font size */
+  display: block;
+  margin-bottom: 10px;
+  color: #333;
+  }
+
+  input[type=text], input[type=email], input[type=password] {
+    border: 2px solid #dfe1e5;
+    border-radius: 8px;
+    padding: 15px;
+    font-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+  }
+
+  button[type=submit] {
+    background-color: #5d93e1;
+    color: white;
+    font-size: 18px;
+    padding: 15px 0;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 10px;
+  }
+
+  button[type=submit]:hover {
+    background-color: #4a7abc; /* Darker shade for hover effect */
+  }
+
+  .alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: none; /* Removing the border for a cleaner look */
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="signup-container">
+  <div class="card">
+    <div class="card-header">Signup</div>
+    <div class="card-body">
+      {% if error_message %}
+        <div class="alert alert-danger" role="alert">{{ error_message }}</div>
+      {% endif %}
+      <form method="post">
+        {% csrf_token %}
+        
+        <!-- Username Field -->
+        <div class="form-group">
+          <input type="text" class="form-control" id="username" name="username" value="{{ form.username.value }}" required minlength="6" title="Username must be at least 6 characters" placeholder="Username">
+          {% for error in form.username.errors %}
+            <div class="alert alert-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <!-- Email Field -->
+        <div class="form-group">
+          <input type="email" class="form-control" id="email" name="email" value="{{ form.email.value }}" required placeholder="Email">
+          {% for error in form.email.errors %}
+            <div class="alert alert-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <!-- DOB Field -->
+        <div class="form-group">
+          <input type="date" class="form-control" id="dob" name="dob" value="{{ form.dob.value|default_if_none:'' }}" required title="Enter your date of birth" placeholder="Date of Birth" min="1900-01-01">
+          {% if form.dob.errors %}
+            <div class="alert alert-danger">{{ form.dob.errors }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Gender Field -->
+        <div class="form-group">
+          <select class="form-control" id="gender" name="gender" required>
+            <option value="" disabled {% if not form.gender.value %}selected{% endif %}>Select your gender</option>
+            {% for value, text in form.fields.gender.choices %}
+              <option value="{{ value }}" {% if form.gender.value == value %}selected{% endif %}>{{ text }}</option>
+            {% endfor %}
+          </select>
+          {% if form.gender.errors %}
+            <div class="alert alert-danger">{{ form.gender.errors }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Password Field -->
+        <div class="form-group">
+          <input type="password" class="form-control" id="password1" name="password1" required minlength="8" title="Password must be at least 8 characters" placeholder="Password">
+          {% if form.password1.errors %}
+            <div class="alert alert-danger">{{ form.password1.errors }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Confirm Password Field -->
+        <div class="form-group">
+          <input type="password" class="form-control" id="password2" name="password2" required minlength="8" title="Password must be at least 8 characters" placeholder="Confirm Password">
+          {% if form.password2.errors %}
+            <div class="alert alert-danger">{{ form.password2.errors }}</div>
+          {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Signup</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var today = new Date().toISOString().split('T')[0];
+    document.getElementsByName("dob")[0].setAttribute('max', today);
+  });
+</script>
+{% endblock %}
+
